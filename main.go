@@ -12,6 +12,16 @@ import (
 
 )
 
+// func createDummyUsers() {
+// 	sqlStatement := `INSERT INTO users (name, email, age, bio, location)  VALUES ($1, $2, $3, $4) RETURNING id`
+// 	id := 0
+// 	err = db.QueryRow(sqlStatement, 30, "jon@calhoun.io", "Jonathan", "Calhoun").Scan(&id)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("New record ID is:", id)
+// }
+
 func main() {
 	config.LoadConfig()
 

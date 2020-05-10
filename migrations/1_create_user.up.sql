@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
        age INTEGER,
        bio TEXT,
        location VARCHAR(50),
-       is_active boolean NOT NULL default false,
+       is_active boolean NOT NULL default true,
        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
