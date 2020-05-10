@@ -36,6 +36,11 @@ $ go build main.go
 $ ./main
 Applying database migrations!
 Ran all migrations
+New User ID is: c886118b-cbfc-48b1-a69b-2966ee52d949
+New User ID is: 396b4912-b964-4aa1-bef4-604e746f2608
+New User ID is: 7cb2a117-e470-4a3d-a132-4cc894cc23f8
+New User ID is: 4f8e9082-e616-48ad-9baf-1931c32d8e25
+New User ID is: 26766cb0-ec6d-4b28-8066-7dbbb278e012
 Closing DB!
 ```
 
@@ -43,5 +48,5 @@ Closing DB!
 
 - [x] Setup env configs and build DB connection
 - [x] Create table (User) with columns (name, bio, age, location, id as UUID)
-- [ ] Insert 100 dummy data into User table
+- [x] Write a function that creates dummy users on demand
 - [ ] Main file should run as CMD which shows the total count of user available in the DB and further takes free text as input and finds users from the User table based on the matches.
