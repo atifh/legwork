@@ -38,19 +38,15 @@ func updateTSVector(id string) {
 	fmt.Println("tvs vector updated for User ID:", id)
 }
 
-
 // creates dummy users and dumps into User table
 func createDummyUsers(count int) {
-	sqlStatement := `INSERT INTO users (name, email, age, bio, location) VALUES ($1, $2, $3, $4, $5) RETURNING id`
-	// id := 0
+	sqlStatement := `INSERT INTO users (name, email, age, bio, location)  VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	var id string
 
 	for i := 0; i < count; i++ {
-		name, email, age, bio, location := randomdata.SillyName(), randomdata.Email(),
-		randomdata.Number(18, 70), randomdata.Paragraph(), randomdata.City()
-
-		//tsv = setweight(to_tsvector(name), 'A') || setweight(to_tsvector(email), 'B')
-		err := DB.QueryRow(sqlStatement, name, email, age, bio, location).Scan(&id)
+		err := DB.QueryRow(sqlStatement,
+			randomdata.SillyName(), randomdata.Email(),
+			randomdata.Number(18, 70), randomdata.Paragraph(), randomdata.City()).Scan(&id)
 
 		if err != nil {
 			panic(err)
@@ -58,7 +54,6 @@ func createDummyUsers(count int) {
 		fmt.Println("New User ID is:", id)
 		updateTSVector(id)
 	}
-
 }
 
 // migrates PostgreSQL DB by referring ./migrations files
