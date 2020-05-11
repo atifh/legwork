@@ -25,28 +25,45 @@ func connectDB() {
 	DB = db
 }
 
+// updates tsvector values (name, email, bio, location) for the given user
+func updateTSVector(id string) {
+	sqlStatement := `UPDATE users SET tsv =	setweight(to_tsvector(name), 'A')
+ || setweight(to_tsvector(email), 'B') || setweight(to_tsvector(location), 'C')
+ || setweight(to_tsvector(bio), 'D') WHERE id=$1`
+
+	_, err := DB.Exec(sqlStatement, id)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("tvs vector updated for User ID:", id)
+}
+
+
 // creates dummy users and dumps into User table
 func createDummyUsers(count int) {
-	sqlStatement := `INSERT INTO users (name, email, age, bio, location)  VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	sqlStatement := `INSERT INTO users (name, email, age, bio, location) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	// id := 0
 	var id string
 
 	for i := 0; i < count; i++ {
-		err := DB.QueryRow(sqlStatement,
-			randomdata.SillyName(), randomdata.Email(),
-			randomdata.Number(18, 70), randomdata.Paragraph(), randomdata.City()).Scan(&id)
+		name, email, age, bio, location := randomdata.SillyName(), randomdata.Email(),
+		randomdata.Number(18, 70), randomdata.Paragraph(), randomdata.City()
+
+		//tsv = setweight(to_tsvector(name), 'A') || setweight(to_tsvector(email), 'B')
+		err := DB.QueryRow(sqlStatement, name, email, age, bio, location).Scan(&id)
 
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println("New User ID is:", id)
+		updateTSVector(id)
 	}
+
 }
 
-func main() {
-	config.LoadConfig()
-	connectDB()
-
+// migrates PostgreSQL DB by referring ./migrations files
+// for new changes
+func migrateDB() {
 	driver, err := postgres.WithInstance(DB, &postgres.Config{})
 	migration, err := migrate.NewWithDatabaseInstance(
 		"file://migrations", config.DatabaseConfig().DbName(), driver)
@@ -61,10 +78,17 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Ran all migrations")
+}
+
+func main() {
+	config.LoadConfig()
+	connectDB()
+	migrateDB()
 
 	// FIXME: Should run this only when there is no user in the DB
-	fmt.Println("Creating dummy users")
-	createDummyUsers(5)
+	count := 5
+	fmt.Printf("Creating %d dummy users\n", count)
+	createDummyUsers(count)
 
 	defer DB.Close()
 

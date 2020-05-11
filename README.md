@@ -13,10 +13,16 @@ $ brew install postgresql
 $ brew services start postgresql
 ```
 
+Create DB
+
+``` sh
+$ createdb DB_NAME
+```
+
 Create PG extension
 
 ```
-psql -h -d DB_NAME -U DB_USER -c 'CREATE EXTENSION if not exists "uuid-ossp"'
+$ psql -h -d DB_NAME -U DB_USER -c 'CREATE EXTENSION if not exists "uuid-ossp"'
 ```
 
 ## Setting up
@@ -36,11 +42,17 @@ $ go build main.go
 $ ./main
 Applying database migrations!
 Ran all migrations
-New User ID is: c886118b-cbfc-48b1-a69b-2966ee52d949
-New User ID is: 396b4912-b964-4aa1-bef4-604e746f2608
-New User ID is: 7cb2a117-e470-4a3d-a132-4cc894cc23f8
-New User ID is: 4f8e9082-e616-48ad-9baf-1931c32d8e25
-New User ID is: 26766cb0-ec6d-4b28-8066-7dbbb278e012
+Creating 5 dummy users
+New User ID is: 37726cba-a502-4c71-b7f3-b6cbef8c066b
+tvs vector updated for User ID: 37726cba-a502-4c71-b7f3-b6cbef8c066b
+New User ID is: ec7fc1ee-dfd5-478b-8c0e-b732a8f242ae
+tvs vector updated for User ID: ec7fc1ee-dfd5-478b-8c0e-b732a8f242ae
+New User ID is: 02512198-7f47-4073-9505-8a45d36f4b9f
+tvs vector updated for User ID: 02512198-7f47-4073-9505-8a45d36f4b9f
+New User ID is: b512c0d2-dced-4df1-a439-d4ab54803aee
+tvs vector updated for User ID: b512c0d2-dced-4df1-a439-d4ab54803aee
+New User ID is: 58dbc7a6-1d81-44cb-ab51-74ead0e6ae0b
+tvs vector updated for User ID: 58dbc7a6-1d81-44cb-ab51-74ead0e6ae0b
 Closing DB!
 ```
 
