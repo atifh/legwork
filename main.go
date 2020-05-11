@@ -8,6 +8,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"legwork/config"
+	"legwork/domain"
        "github.com/Pallinder/go-randomdata"
 
 )
@@ -75,15 +76,49 @@ func migrateDB() {
 	fmt.Println("Ran all migrations")
 }
 
+// finds users matching the given string from Users table
+func searchUsers(searchString string) {
+	sqlStatement := `SELECT id, name, email, bio, location FROM users, plainto_tsquery($1) q WHERE tsv @@ q;`
+	var id, name, email, location, bio string
+	searchResults := []domain.User{}
+
+	rows, err := DB.Query(sqlStatement, searchString)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&id, &name, &email, &location, &bio)
+		if err != nil {
+			panic(err)
+		}
+		user := domain.User {
+			ID: id,
+			Name: name,
+			Email: email,
+			Bio: bio,
+			Location: location,
+
+		}
+		// fmt.Println(user)
+		searchResults = append(searchResults, user)
+
+	}
+	fmt.Printf("Fount %d Search Results for %s\n\n", len(searchResults), searchString)
+	fmt.Println(searchResults)
+}
+
 func main() {
 	config.LoadConfig()
 	connectDB()
 	migrateDB()
 
+	searchUsers("dog blood")
+
 	// FIXME: Should run this only when there is no user in the DB
-	count := 5
-	fmt.Printf("Creating %d dummy users\n", count)
-	createDummyUsers(count)
+	// count := 5
+	// fmt.Printf("Creating %d dummy users\n", count)
+	// createDummyUsers(count)
 
 	defer DB.Close()
 
