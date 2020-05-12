@@ -2,6 +2,9 @@ package main
 
 import (
         "fmt"
+	"os"
+	"bufio"
+	"strings"
 	"encoding/json"
 	"database/sql"
 	_ "github.com/lib/pq"
@@ -107,22 +110,85 @@ func searchUsers(searchString string) (searchResults []map[string]interface{}) {
 	return
 }
 
+func getUserCount() (count int){
+	row := DB.QueryRow("SELECT COUNT(*) FROM users")
+	err := row.Scan(&count)
+	if err != nil {
+		panic(err)
+	}
+	return
+
+}
+
+func getAllUsers() (userList []map[string]interface{}) {
+	sqlStatement := `SELECT id, name, email, location, bio FROM users;`
+	var id, name, email, location, bio string
+	// searchResults := []domain.User{}
+
+	rows, err := DB.Query(sqlStatement)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&id, &name, &email, &location, &bio)
+		if err != nil {
+			panic(err)
+		}
+		user := domain.User {
+			ID: id,
+			Name: name,
+			Email: email,
+			Bio: bio,
+			Location: location}
+
+		userList = append(userList, structs.Map(user))
+
+	}
+	return
+}
+
 func main() {
 	config.LoadConfig()
 	connectDB()
 	migrateDB()
-	searchString := "dog blood"
+
+	// check to create new users
+	userCount := getUserCount()
+	if userCount == 0 {
+		var usersToCreate int
+		// fmt.Println("There is no users in the DB")
+		fmt.Print("How many users do you want to auto create? (5, 10 ..) >> ")
+		fmt.Scanln(&usersToCreate)
+		if usersToCreate == 0 {
+			fmt.Println("No input received!")
+			os.Exit(1)
+		}
+		fmt.Printf("Creating %d dummy users\n", usersToCreate)
+		createDummyUsers(usersToCreate)
+	}
+
+	// show all the users
+	userList := getAllUsers()
+	userListJson, _ := json.MarshalIndent(userList, "", "    ")
+	fmt.Printf("\n %d Users in the DB \n\n", len(userList))
+	fmt.Println(string(userListJson))
+
+	// search users
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter any text to search users: >> ")
+	searchString, _ := reader.ReadString('\n')
+	fmt.Scanln(&searchString)
+	if strings.TrimSpace(searchString) == "" {
+		fmt.Println("No input received!")
+		os.Exit(1)
+	}
 
 	searchResults := searchUsers(searchString)
 	resultJson, _ := json.MarshalIndent(searchResults, "", "    ")
 	fmt.Printf("\nFound %d Search Results for %s\n\n", len(searchResults), searchString)
 	fmt.Println(string(resultJson))
 
-
-	// FIXME: Should run this only when there is no user in the DB
-	// count := 5
-	// fmt.Printf("Creating %d dummy users\n", count)
-	// createDummyUsers(count)
 
 	defer DB.Close()
 
