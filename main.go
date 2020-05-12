@@ -2,6 +2,7 @@ package main
 
 import (
         "fmt"
+	"encoding/json"
 	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/golang-migrate/migrate/v4"
@@ -9,6 +10,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"legwork/config"
 	"legwork/domain"
+	"github.com/fatih/structs"
        "github.com/Pallinder/go-randomdata"
 
 )
@@ -77,10 +79,10 @@ func migrateDB() {
 }
 
 // finds users matching the given string from Users table
-func searchUsers(searchString string) {
-	sqlStatement := `SELECT id, name, email, bio, location FROM users, plainto_tsquery($1) q WHERE tsv @@ q;`
+func searchUsers(searchString string) (searchResults []map[string]interface{}) {
+	sqlStatement := `SELECT id, name, email, location, bio FROM users, plainto_tsquery($1) q WHERE tsv @@ q;`
 	var id, name, email, location, bio string
-	searchResults := []domain.User{}
+	// searchResults := []domain.User{}
 
 	rows, err := DB.Query(sqlStatement, searchString)
 	if err != nil {
@@ -97,23 +99,25 @@ func searchUsers(searchString string) {
 			Name: name,
 			Email: email,
 			Bio: bio,
-			Location: location,
+			Location: location}
 
-		}
-		// fmt.Println(user)
-		searchResults = append(searchResults, user)
+		searchResults = append(searchResults, structs.Map(user))
 
 	}
-	fmt.Printf("Fount %d Search Results for %s\n\n", len(searchResults), searchString)
-	fmt.Println(searchResults)
+	return
 }
 
 func main() {
 	config.LoadConfig()
 	connectDB()
 	migrateDB()
+	searchString := "dog blood"
 
-	searchUsers("dog blood")
+	searchResults := searchUsers(searchString)
+	resultJson, _ := json.MarshalIndent(searchResults, "", "    ")
+	fmt.Printf("\nFound %d Search Results for %s\n\n", len(searchResults), searchString)
+	fmt.Println(string(resultJson))
+
 
 	// FIXME: Should run this only when there is no user in the DB
 	// count := 5

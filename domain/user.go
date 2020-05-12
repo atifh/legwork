@@ -9,6 +9,6 @@ type User struct {
 	Email        string      `db:email`
 	Bio          string      `db:"bio"`
 	Location     string      `db:"location`
-	IsActive     bool        `db:is_active`
+	// IsActive     bool        `db:is_active`
 
 }

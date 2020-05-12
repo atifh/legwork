@@ -3,6 +3,8 @@ legwork
 
 A simple command line tool written in Go to perform PosgreSQL Full Text search.
 
+*NOTE: Make sure you have [installed Go](https://golang.org/doc/install) locally.*
+
 
 ### Setup database
 
@@ -42,17 +44,18 @@ $ go build main.go
 $ ./main
 Applying database migrations!
 Ran all migrations
-Creating 5 dummy users
-New User ID is: 37726cba-a502-4c71-b7f3-b6cbef8c066b
-tvs vector updated for User ID: 37726cba-a502-4c71-b7f3-b6cbef8c066b
-New User ID is: ec7fc1ee-dfd5-478b-8c0e-b732a8f242ae
-tvs vector updated for User ID: ec7fc1ee-dfd5-478b-8c0e-b732a8f242ae
-New User ID is: 02512198-7f47-4073-9505-8a45d36f4b9f
-tvs vector updated for User ID: 02512198-7f47-4073-9505-8a45d36f4b9f
-New User ID is: b512c0d2-dced-4df1-a439-d4ab54803aee
-tvs vector updated for User ID: b512c0d2-dced-4df1-a439-d4ab54803aee
-New User ID is: 58dbc7a6-1d81-44cb-ab51-74ead0e6ae0b
-tvs vector updated for User ID: 58dbc7a6-1d81-44cb-ab51-74ead0e6ae0b
+
+Found 1 Search Results for dog blood
+
+[
+    {
+        "Bio": "One dog rolled before him, well-nigh slashed in half; but a second had him by the thigh, a third gripped his collar be- hind, and a fourth had the blade of the sword between its teeth, tasting its own blood.",
+        "Email": "sofiajackson677@example.org",
+        "ID": "2aec998e-2194-4bb9-b429-bc7b8df593ce",
+        "Location": "Newstead",
+        "Name": "Nosecandle"
+    }
+]
 Closing DB!
 ```
 
